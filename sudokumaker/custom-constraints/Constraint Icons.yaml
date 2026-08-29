@@ -3,8 +3,16 @@ name: Constraint Icons
 backend:
   type: code
   code: |-
-    function postprocessJSON(json, input) {
-
+    function postprocessJSON(json, input, helpers, puzzle) {
+      // Input: comma-separated icon keys.
+      // Blank or "auto" = automatic detection.
+      // "auto,icon" = automatic + manual.
+      // "icon1,icon2" = manual only.
+      //
+      // To add a new icon:
+      // 1. Add it to ICONS.
+      // 2. (Optional) Add an AUTO_RULES detector.
+      
       // ==========================================================
       // Configuration
       // ==========================================================
@@ -12,7 +20,75 @@ backend:
       const START_X = -0.5;
       const START_Y = 0.5;
       const SPACING = 1.0;
-
+      const AUTO_RULES = [
+        {
+          icon: "anti-king",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.Antiking,
+        },
+      
+        {
+          icon: "anti-knight",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.Antiknight,
+        },
+      
+        {
+          icon: "disjoint-groups",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.DisjointGroups,
+        },
+      
+        {
+          icon: "nonconsecutive",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.Nonconsecutive,
+        },
+      
+        {
+          icon: "global-2x2",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.GlobalEntropy,
+        },
+      
+        {
+          icon: "anti-doubles",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.Ratio &&
+            c.config.negative?.length > 0,
+        },
+      
+        {
+          icon: "nonconsecutive",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.Difference &&
+            c.config.negative?.length > 0,
+        },
+      
+        {
+          icon: "anti-x",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.XV &&
+            c.config.negative?.includes(10),
+        },
+      
+        {
+          icon: "anti-v",
+          matches: c =>
+            c.enabled &&
+            c.config.type == Api.PuzzleElementType.XV &&
+            c.config.negative?.includes(5),
+        },
+      
+      ];
       const DEFAULT_TEXT = {
         width: 0,
         height: 1.206,
@@ -44,7 +120,8 @@ backend:
       function circle(x, y, r) {
         return `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0-${2*r} 0`;
       }
-      
+      // Icon definitions. Layers are top to bottom. 
+      // Layers may contain { text, fontSize } or { path }.
       const ICONS = {
 
         "anti-knight": [
@@ -144,11 +221,25 @@ backend:
       // Rules to display
       // ==========================================================
 
-      const rules = input.groups[0]?.value
-        ?.split(",")
-        .map(s => s.trim())
-        .filter(Boolean) ?? [];
+      const rules = new Set(
+        input.groups[0]?.value
+          ?.split(",")
+          ?.map(s => s.trim())
+          ?.filter(Boolean) ?? []
+      );
 
+      if (rules.has("auto") || rules.size == 0) {
+      
+          for (const detector of AUTO_RULES) {
+      
+              if (puzzle.allConstraints.some(detector.matches)) {
+                  rules.add(detector.icon);
+              }
+      
+          }
+      
+          rules.delete("auto");
+      }
       // ==========================================================
       // Generate
       // ==========================================================
@@ -197,6 +288,21 @@ backend:
       }
 
     }
+      //console.table(Api.PuzzleElementType);
+      //for (const c of puzzle.allConstraints) {
+      //  console.log(JSON.stringify(c, null, 2));
+      //}
+      //for (const c of puzzle.allConstraints) {
+      //    console.log(
+      //        c.name,
+      //        c.config.type,
+      //        Object.entries(Api.PuzzleElementType)
+      //           .find(([, v]) => v === c.config.type)
+      //    );
+      //}
+      //console.table(Api.PuzzleElementType);
+
+      //return;
 input:
 - id: groups
   label: Groups
