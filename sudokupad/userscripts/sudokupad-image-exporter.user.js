@@ -34,30 +34,21 @@
         Framework.showDialog();
         const dialog = document.querySelector('.dialog-overlay .dialog-content, .dialog-content, .dialog-overlay .dialog, .dialog');
         if (!dialog) return alert('Unable to open the export dialog.');
-        dialog.innerHTML = `<div class="image-export-dialog" style="min-width:320px;padding:16px;font:inherit;color:inherit">
+        dialog.innerHTML = `<div class="image-export-dialog" style="min-width:420px;padding:16px;font:inherit;color:inherit">
             <h2 style="margin:0 0 16px">Export Puzzle</h2>
-            <fieldset style="border:0;margin:0 0 14px;padding:0"><legend>Format</legend>
-                <label><input type="radio" name="format" value="png"> PNG</label>
-                <label style="margin-left:16px"><input type="radio" name="format" value="svg"> SVG</label>
-            </fieldset>
-            <fieldset style="border:0;margin:0 0 14px;padding:0"><legend>Background</legend>
-                <label><input id="image-export-transparent" type="checkbox"> Transparent background</label>
-            </fieldset>
-            <label style="display:flex;align-items:center;gap:8px;margin-bottom:14px">Resolution <input id="image-export-resolution" type="number" min="1" step="1" style="width:96px"> px</label>
-            <fieldset style="border:0;margin:0 0 14px;padding:0"><legend>Crop</legend>
-                <label><input type="radio" name="crop" value="full"> Full Puzzle</label>
-                <label style="margin-left:10px"><input type="radio" name="crop" value="board"> Board Only</label>
-                <label style="margin-left:10px"><input type="radio" name="crop" value="custom"> Custom</label>
-            </fieldset>
-            <fieldset style="border:0;margin:0 0 16px;padding:0"><legend>Viewport</legend>
-                <div style="display:grid;grid-template-columns:auto 1fr auto 1fr;gap:8px;align-items:center">
+            <div style="display:grid;grid-template-columns:92px 1fr;gap:12px 8px;align-items:center">
+                <div>Format:</div><div style="display:grid;grid-template-columns:92px 1fr;gap:12px 8px;align-items:center"><label><input type="radio" name="format" value="png"> PNG</label><label style="margin-left:16px"><input type="radio" name="format" value="svg"> SVG</label></div>
+                <div>Background:</div><label><input id="image-export-transparent" type="checkbox"> Transparent</label>
+                <label for="image-export-resolution">Resolution:</label><div><input id="image-export-resolution" type="number" min="1" step="1" style="width:96px"> px</div>
+                <div>Crop:</div><div style="display:grid;grid-template-columns:92px 1fr 1fr;gap:12px 8px 8px;align-items:center"><label><input type="radio" name="crop" value="full">Full</label><label style="margin-left:10px"><input type="radio" name="crop" value="board">Board</label><label style="margin-left:10px"><input type="radio" name="crop" value="custom">Custom</label></div>
+                <div style="align-self:start;padding-top:5px">Viewport:</div><div style="display:grid;grid-template-columns:16px 92px 16px 92px;gap:7px 8px;align-items:center">
                     <label for="image-export-x">X</label><input id="image-export-x" type="number" step="any">
                     <label for="image-export-y">Y</label><input id="image-export-y" type="number" step="any">
-                    <label for="image-export-width">Width</label><input id="image-export-width" type="number" min="1" step="any">
-                    <label for="image-export-height">Height</label><input id="image-export-height" type="number" min="1" step="any">
+                    <label for="image-export-width">W</label><input id="image-export-width" type="number" min="1" step="any">
+                    <label for="image-export-height">H</label><input id="image-export-height" type="number" min="1" step="any">
                 </div>
-            </fieldset>
-            <div style="display:flex;justify-content:flex-end;gap:8px"><button type="button" data-action="download">Download</button><button type="button" data-action="clipboard">Clipboard</button></div>
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button type="button" data-action="download">Download</button><button type="button" data-action="clipboard">Clipboard</button></div>
         </div>`;
         const form = dialog.querySelector('.image-export-dialog');
         form.querySelector(`[name=format][value="${saved.format}"]`).checked = true;
