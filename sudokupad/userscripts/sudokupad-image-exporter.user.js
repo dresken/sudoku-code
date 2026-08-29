@@ -35,11 +35,11 @@
         const dialog = document.querySelector('.dialog-overlay .dialog-content, .dialog-content, .dialog-overlay .dialog, .dialog');
         if (!dialog) return alert('Unable to open the export dialog.');
         dialog.innerHTML = `<div class="image-export-dialog" style="min-width:420px;padding:16px;font:inherit;color:inherit">
-            <h2 style="margin:0 0 16px">Export Puzzle</h2>
+            <h2 style="margin:0 0 16px">Image Exporter</h2>
             <div style="display:grid;grid-template-columns:92px 1fr;gap:12px 8px;align-items:center">
                 <div>Format:</div><div style="display:grid;grid-template-columns:92px 1fr;gap:12px 8px;align-items:center"><label><input type="radio" name="format" value="png"> PNG</label><label style="margin-left:16px"><input type="radio" name="format" value="svg"> SVG</label></div>
                 <div>Background:</div><label><input id="image-export-transparent" type="checkbox"> Transparent</label>
-                <label for="image-export-resolution">Resolution:</label><div><input id="image-export-resolution" type="number" min="1" step="1" style="width:96px"> px</div>
+                <div>Resolution:</div><div><input id="image-export-resolution" type="number" min="1" step="1" style="width:96px"> px</div>
                 <div>Crop:</div><div style="display:grid;grid-template-columns:92px 1fr 1fr;gap:12px 8px 8px;align-items:center"><label><input type="radio" name="crop" value="full">Full</label><label style="margin-left:10px"><input type="radio" name="crop" value="board">Board</label><label style="margin-left:10px"><input type="radio" name="crop" value="custom">Custom</label></div>
                 <div style="align-self:start;padding-top:5px">Viewport:</div><div style="display:grid;grid-template-columns:16px 92px 16px 92px;gap:7px 8px;align-items:center">
                     <label for="image-export-x">X</label><input id="image-export-x" type="number" step="any">
@@ -64,7 +64,23 @@
             updateDialogState(form);
         });
         form.querySelector('[data-action=download]').addEventListener('click', () => runExport(collectOptions(form), 'download'));
-        form.querySelector('[data-action=clipboard]').addEventListener('click', () => runExport(collectOptions(form), 'clipboard'));
+        const clipboardButton = form.querySelector('[data-action=clipboard]');
+        clipboardButton.addEventListener('click', async () => {
+            const originalText = clipboardButton.textContent;
+            try {
+                await runExport(collectOptions(form), 'clipboard');
+
+                clipboardButton.textContent = 'Copied!';
+                clipboardButton.disabled = true;
+
+                setTimeout(() => {
+                    clipboardButton.textContent = originalText;
+                    clipboardButton.disabled = false;
+                }, 10000);
+            } catch (_) {
+                // runExport already reports errors
+            }
+        });
     }
 
     function collectOptions(form) {
@@ -79,11 +95,17 @@
     }
 
     async function runExport(options, destination) {
-        try {
-            const svg = await buildProcessedSvg(options);
-            if (destination === 'download') return options.format === 'png' ? downloadPNG(svg, options) : downloadSVG(svg);
-            return options.format === 'png' ? copyPNG(svg, options) : copySVG(svg);
-        } catch (error) { console.error('Image export failed:', error); alert(`Image export failed: ${error.message || error}`); }
+        const svg = await buildProcessedSvg(options);
+
+        if (destination === 'download') {
+            return options.format === 'png'
+                ? downloadPNG(svg, options)
+                : downloadSVG(svg);
+        }
+
+        return options.format === 'png'
+            ? copyPNG(svg, options)
+            : copySVG(svg);
     }
 
     async function buildProcessedSvg(options) {
