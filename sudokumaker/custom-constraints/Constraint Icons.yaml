@@ -9,27 +9,27 @@ backend:
       // Configuration
       // ==========================================================
 
-      const APPLY_VEIL = true;
-
       const START_X = 0.5;
       const START_Y = -0.5;
       const SPACING = 1.0;
 
-      const VEIL = {
+      const VEIL = "veil";
+
+      const VEIL_LAYER = {
         width: 1.02,
         height: 1.02,
         thickness: 1.28,
         angle: 0,
-        backgroundColor: "#fffa",
+        backgroundColor: "#ffffffaa",
       };
 
       const DEFAULT_TEXT = {
         width: 0,
         height: 1.206,
-        stroke: "#ffffff",
+        stroke: "#000000",
         "stroke-width": 1.28,
         "stroke-linejoin": "round",
-        color: "#000000",
+        color: "#666666",
         angle: 0,
         rounded: true,
       };
@@ -38,27 +38,32 @@ backend:
 
         "anti-knight": [
           { text: "🚫", fontSize: 42 },
-          { text: "♞", fontSize: 44 },
+          VEIL,
+          { text: "♞", fontSize: 50 },
         ],
 
         "anti-king": [
           { text: "🚫", fontSize: 42 },
-          { text: "♚", fontSize: 44 },
+          VEIL,
+          { text: "♚", fontSize: 50 },
         ],
 
         "anti-x": [
           { text: "🚫", fontSize: 42 },
-          { text: "X", fontSize: 48 },
+          VEIL,
+          { text: "X", fontSize: 44 },
         ],
 
         "anti-v": [
           { text: "🚫", fontSize: 42 },
-          { text: "V", fontSize: 48 },
+          VEIL,
+          { text: "V", fontSize: 44 },
         ],
 
         "nonconsecutive": [
           { text: "🚫", fontSize: 42 },
-          { text: "±1", fontSize: 30 },
+          VEIL,
+          { text: "±1", fontSize: 28 },
         ],
 
       };
@@ -92,6 +97,14 @@ backend:
 
         for (const layer of layers) {
 
+          if (layer === VEIL) {
+            json.underlays.push({
+              center: [x, START_Y],
+              ...VEIL_LAYER,
+            });
+            continue;
+          }
+
           json.underlays.push({
             center: [
               x + (layer.dx ?? 0),
@@ -102,12 +115,7 @@ backend:
           });
 
         }
-        if (APPLY_VEIL) {
-          json.underlays.push({
-            center: [x, START_Y],
-            ...VEIL,
-          });
-        }
+
         x += SPACING;
       }
 
