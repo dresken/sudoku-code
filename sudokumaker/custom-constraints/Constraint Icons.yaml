@@ -9,63 +9,119 @@ backend:
       // Configuration
       // ==========================================================
 
-      const START_X = 0.5;
-      const START_Y = -0.5;
+      const START_X = -0.5;
+      const START_Y = 0.5;
       const SPACING = 1.0;
-
-      const VEIL = "veil";
-
-      const VEIL_LAYER = {
-        width: 1.02,
-        height: 1.02,
-        thickness: 1.28,
-        angle: 0,
-        backgroundColor: "#ffffffaa",
-      };
 
       const DEFAULT_TEXT = {
         width: 0,
         height: 1.206,
-        stroke: "#000000",
-        "stroke-width": 1.28,
+        stroke: "#ffffff",
+        "stroke-width": 0.5,
         "stroke-linejoin": "round",
         color: "#666666",
         angle: 0,
         rounded: true,
       };
 
+      const DEFAULT_PATH = {
+        stroke: "#666666",
+        fill: "none",
+        "stroke-width": 1.28,
+        "stroke-linejoin": "round",
+        "stroke-linecap": "round",
+      };
+
+      function circle(x, y, r) {
+        return `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0-${2*r} 0`;
+      }
+      
       const ICONS = {
 
         "anti-knight": [
-          { text: "🚫", fontSize: 42 },
-          VEIL,
-          { text: "♞", fontSize: 50 },
+          { text: "♞", fontSize: 52 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
         "anti-king": [
-          { text: "🚫", fontSize: 42 },
-          VEIL,
-          { text: "♚", fontSize: 50 },
+          { text: "♚", fontSize: 52 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
         "anti-x": [
-          { text: "🚫", fontSize: 42 },
-          VEIL,
-          { text: "X", fontSize: 44 },
+          { text: "X", fontSize: 38 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
         "anti-v": [
-          { text: "🚫", fontSize: 42 },
-          VEIL,
-          { text: "V", fontSize: 44 },
+          { text: "V", fontSize: 38 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
         "nonconsecutive": [
-          { text: "🚫", fontSize: 42 },
-          VEIL,
-          { text: "±1", fontSize: 28 },
+          { text: "±", fontSize: 24, dy:-0.11, dx:-0.05 },
+          { text: "1", fontSize: 24, dy:0.11, dx:-0.05 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
+        "anti-doubles": [
+          { text: "×", fontSize: 24, dy:-0.11, dx:-0.05 },
+          { text: "2", fontSize: 24, dy:0.11, dx:-0.05 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
+        ],
+
+        "anti-doubles": [
+          { text: "×", fontSize: 24, dy:-0.11, dx:-0.05 },
+          { text: "2", fontSize: 24, dy:0.11, dx:-0.05 },
+          { text: "🚫", fontSize: 42, opacity: 0.4 },
+        ],
+        
+        "disjoint-groups": [
+          {
+            path: 
+              "M6.4 6.4V-6.4H19.2V6.4 " +
+              "M6.4 19.2H-6.4V-6.4H6.4V-19.2H19.2V-6.4 " +
+              "M-6.4 6.4H-19.2V19.2H-6.4 " +
+              "M6.4-19.2H-6.4V-6.4H-19.2V6.4 " +
+              "M-6.4-19.2H-19.2V-6.4 " +
+              "M-6.4 6.4H19.2V19.2H6.4V6.4"
+          },
+          {
+            path: [
+              circle(-12.8, -12.8, 2.5),
+              circle(0,     -12.8, 2.5),
+              circle(12.8,  -12.8, 2.5),
+              
+              circle(-12.8, 0,      2.5),
+              circle(0,      0,      2.5),
+              circle(12.8,   0,      2.5),
+              
+              circle(-12.8, 12.8,   2.5),
+              circle(0,      12.8,   2.5),
+              circle(12.8,   12.8,   2.5),
+            ].join(" "),
+            fill: "#666666",
+            stroke: "none",
+          },
+        ],
+        
+        "global-entropy": [
+          {
+            path:
+              "M-19.2-19.2H19.2V19.2H-19.2Z " +
+              "M0-19.2V19.2 " +
+              "M-19.2 0H19.2"
+          }
+        ],
+        
+        "global-mod-3": [
+          { text: "③", fontSize: 34 },
+        ],
+
+        "rotational": [
+          { text: "↻", fontSize: 38 },
+        ],
+        
       };
 
       // ==========================================================
@@ -83,7 +139,7 @@ backend:
 
       json.underlays ??= [];
 
-      let x = START_X;
+      let y = START_Y;
 
       for (const rule of rules) {
 
@@ -91,32 +147,37 @@ backend:
 
         if (!layers) {
           console.warn(`Unknown global rule '${rule}'`);
-          x += SPACING;
+          y += SPACING;
           continue;
         }
 
         for (const layer of layers) {
 
-          if (layer === VEIL) {
-            json.underlays.push({
-              center: [x, START_Y],
-              ...VEIL_LAYER,
+          if (layer.path) {
+        
+            json.lines ??= [];
+        
+            json.lines.push({
+              target: "underlay",
+              d: layer.path,
+              transform: `translate(${y * 64} ${START_X * 64})`,
+              ...DEFAULT_PATH,
+              ...layer,
             });
-            continue;
+          } else {
+            json.underlays.push({
+              center: [
+                START_X + (layer.dx ?? 0),
+                y + (layer.dy ?? 0),
+              ],
+              ...DEFAULT_TEXT,
+              ...layer,
+            });
           }
-
-          json.underlays.push({
-            center: [
-              x + (layer.dx ?? 0),
-              START_Y + (layer.dy ?? 0),
-            ],
-            ...DEFAULT_TEXT,
-            ...layer,
-          });
 
         }
 
-        x += SPACING;
+        y += SPACING;
       }
 
     }
