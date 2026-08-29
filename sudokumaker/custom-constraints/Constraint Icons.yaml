@@ -135,12 +135,12 @@ backend:
         ],
 
         "anti-x": [
-          { text: "X", fontSize: 38 },
+          { text: "X", fontSize: 38, dx: -0.04 },
           { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
         "anti-v": [
-          { text: "V", fontSize: 38 },
+          { text: "V", fontSize: 38, dx: -0.04 },
           { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
@@ -150,10 +150,16 @@ backend:
           { text: "🚫", fontSize: 42, opacity: 0.4 },
         ],
 
-        "anti-doubles": [
-          { text: "×", fontSize: 24, dy:-0.11, dx:-0.05 },
-          { text: "2", fontSize: 24, dy:0.11, dx:-0.05 },
-          { text: "🚫", fontSize: 42, opacity: 0.4 },
+        "consecutive": [
+          { text: "±", fontSize: 24, dy:-0.11, dx:-0.05 },
+          { text: "1", fontSize: 24, dy:0.11, dx:-0.05 },
+          { path: circle(0, 0, 16), fill: "none", stroke: "#72B36A", "stroke-width": 4 },
+        ],
+        "flatmates": [
+          { text: "1", fontSize: 5, dy:0, dx:-0.23 },
+          { text: "5", fontSize: 5, dy:0, dx:-0.08 },
+          { text: "9", fontSize: 5, dy:0, dx:0.07 },
+          { path: circle(0, 0, 16), fill: "none", stroke: "#72B36A", "stroke-width": 4 },
         ],
 
         "anti-doubles": [
