@@ -1,0 +1,89 @@
+formatVersion: '1'
+name: YinYang
+backend:
+  type: code
+  code: |-
+    function postprocessJSON(json) {
+      const gridSize = 64;
+
+      const FIRE = "#ef6a6a"; // soft warm red
+      const ICE  = "#9adfff"; // very light sky blue
+      
+      const YIN =
+        "M0,-38a38,38 0 0 1 0,76a19,19 0 0 1 0,-38a19,19 0 0 0 0,-38";
+
+      const YANG =
+        "M0,38a38,38 0 0 1 0,-76a19,19 0 0 1 0,38a19,19 0 0 0 0,38";
+
+      const YANG_DOT =
+        "M-5,19 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0";
+
+      const YIN_DOT =
+        "M-5,-19 a5,5 0 1,0 10,0 a5,5 0 1,0 -10,0";
+
+      json.lines ??= [];
+
+      function addPath(d, fill, stroke, strokeWidth, transform) {
+        const line = {
+          target: "cell-grids",
+          d,
+          fill,
+          transform
+        };
+
+        if (stroke) {
+          line.stroke = stroke;
+          line["stroke-width"] = strokeWidth;
+          line["stroke-linejoin"] = "round";
+          line["stroke-linecap"] = "round";
+        }
+
+        json.lines.push(line);
+      }
+
+      function addYinYang(col, row) {
+        const x = col * gridSize;
+        const y = row * gridSize;
+
+        // Original artwork is 78 units across.
+        // Adjust 0.92 if you want it slightly larger/smaller.
+        const scale = (gridSize * 0.92) / 78;
+
+        const transform = `translate(${x} ${y}) scale(${scale})`;
+
+        addPath(
+          YIN,
+          ICE,
+          null,
+          null,
+          transform
+        );
+
+        addPath(
+          YANG,
+          FIRE,
+          null,
+          null,
+          transform
+        );
+
+        addPath(
+          YANG_DOT,
+          FIRE,
+          null,
+          null,
+          transform
+        );
+
+        addPath(
+          YIN_DOT,
+          ICE,
+          null,
+          null,
+          transform
+        );
+      }
+
+      // R5C5
+      addYinYang(4.5, 4.5);
+    }

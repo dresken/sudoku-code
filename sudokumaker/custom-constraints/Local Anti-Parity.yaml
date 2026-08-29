@@ -1,0 +1,50 @@
+formatVersion: '1'
+name: Local Anti-Parity
+backend:
+  type: code
+  code: |-
+    const orthogonalOffsets = [
+      [-1, 0],
+      [ 1, 0],
+      [ 0,-1],
+      [ 0, 1],
+    ];
+
+    for (const group of input.groups) {
+      const seen = new Set();
+
+      for (const cell of group.cells) {
+        const { x, y } = helpers.cellIds.getCoordsFromId(cell);
+
+        for (const [dx, dy] of orthogonalOffsets) {
+          const x2 = x + dx;
+          const y2 = y + dy;
+
+          // Ignore cells off the grid
+          if (x2 < 0 || y2 < 0 || x2 >= puzzle.width || y2 >= puzzle.height) {
+            continue;
+          }
+
+          const other = helpers.cellIds.getIdFromCoords({ x: x2, y: y2 });
+
+          // Prevent duplicate constraints
+          const key = cell < other ? `${cell}:${other}` : `${other}:${cell}`;
+          if (seen.has(key)) continue;
+          seen.add(key);
+
+          sudoku.addConstraintComponent(
+            new PairComponent(
+              helpers.naming.getCellsDescription([cell, other]),
+              (d1, d2) => (d1 % 2) !== (d2 % 2),
+              cell,
+              other
+            )
+          );
+        }
+      }
+    }
+input:
+- id: groups
+  label: Groups
+  params:
+    type: raw

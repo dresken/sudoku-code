@@ -1,0 +1,119 @@
+formatVersion: '1'
+name: Constraint Icons
+backend:
+  type: code
+  code: |-
+    function postprocessJSON(json, input) {
+
+      // ==========================================================
+      // Configuration
+      // ==========================================================
+
+      const APPLY_VEIL = true;
+
+      const START_X = 0.5;
+      const START_Y = -0.5;
+      const SPACING = 1.0;
+
+      const VEIL = {
+        width: 1.02,
+        height: 1.02,
+        thickness: 1.28,
+        angle: 0,
+        backgroundColor: "#fffa",
+      };
+
+      const DEFAULT_TEXT = {
+        width: 0,
+        height: 1.206,
+        stroke: "#ffffff",
+        "stroke-width": 1.28,
+        "stroke-linejoin": "round",
+        color: "#000000",
+        angle: 0,
+        rounded: true,
+      };
+
+      const ICONS = {
+
+        "anti-knight": [
+          { text: "🚫", fontSize: 42 },
+          { text: "♞", fontSize: 44 },
+        ],
+
+        "anti-king": [
+          { text: "🚫", fontSize: 42 },
+          { text: "♚", fontSize: 44 },
+        ],
+
+        "anti-x": [
+          { text: "🚫", fontSize: 42 },
+          { text: "X", fontSize: 48 },
+        ],
+
+        "anti-v": [
+          { text: "🚫", fontSize: 42 },
+          { text: "V", fontSize: 48 },
+        ],
+
+        "nonconsecutive": [
+          { text: "🚫", fontSize: 42 },
+          { text: "±1", fontSize: 30 },
+        ],
+
+      };
+
+      // ==========================================================
+      // Rules to display
+      // ==========================================================
+
+      const rules = input.groups[0]?.value
+        ?.split(",")
+        .map(s => s.trim())
+        .filter(Boolean) ?? [];
+
+      // ==========================================================
+      // Generate
+      // ==========================================================
+
+      json.underlays ??= [];
+
+      let x = START_X;
+
+      for (const rule of rules) {
+
+        const layers = ICONS[rule];
+
+        if (!layers) {
+          console.warn(`Unknown global rule '${rule}'`);
+          x += SPACING;
+          continue;
+        }
+
+        for (const layer of layers) {
+
+          json.underlays.push({
+            center: [
+              x + (layer.dx ?? 0),
+              START_Y + (layer.dy ?? 0),
+            ],
+            ...DEFAULT_TEXT,
+            ...layer,
+          });
+
+        }
+        if (APPLY_VEIL) {
+          json.underlays.push({
+            center: [x, START_Y],
+            ...VEIL,
+          });
+        }
+        x += SPACING;
+      }
+
+    }
+input:
+- id: groups
+  label: Groups
+  params:
+    type: raw

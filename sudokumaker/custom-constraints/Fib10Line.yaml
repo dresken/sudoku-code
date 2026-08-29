@@ -1,0 +1,43 @@
+formatVersion: '1'
+name: Fib10Line
+backend:
+  type: code
+  code: |-
+    for (const group of input.groups) {
+        if (group.cells.length < 3) continue;
+
+        puzzle.addConstraintComponent(
+            new FibonacciLineComponent(
+                "Fibonacci line " + helpers.naming.getCellsDescription(group.cells),
+                group.cells
+            )
+        );
+    }
+components:
+- name: FibonacciLineComponent
+  type: code
+  code: |-
+    function validate(instance, puzzle) {
+        const { cells } = instance;
+
+        if (!puzzle.getCellsAreFilled(cells)) {
+            return true;
+        }
+
+        for (let i = 2; i < cells.length; i++) {
+            const a = puzzle.getValue(cells[i - 2]);
+            const b = puzzle.getValue(cells[i - 1]);
+            const c = puzzle.getValue(cells[i]);
+
+            if ((a + b) % 10 !== c) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+input:
+- id: groups
+  label: Groups
+  params:
+    type: raw

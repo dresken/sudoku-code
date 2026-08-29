@@ -50,9 +50,3 @@ podman run --rm \
 ```
 
 The output is written alongside the mounted input file.
-
-## Tests
-
-```bash
-python -m unittest discover -s tests -v
-```
