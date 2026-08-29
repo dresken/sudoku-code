@@ -1,5 +1,5 @@
 formatVersion: '1'
-name: YinYang
+name: YinYangIcon
 backend:
   type: code
   code: |-
