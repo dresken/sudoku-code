@@ -32,6 +32,15 @@ backend:
         "stroke-linecap": "round",
       };
 
+      function rect(x, y, width, height = width) {
+        const x1 = x - width / 2;
+        const y1 = y - height / 2;
+        const x2 = x + width / 2;
+        const y2 = y + height / 2;
+      
+        return `M${x1} ${y1}H${x2}V${y2}H${x1}Z`;
+      }
+      
       function circle(x, y, r) {
         return `M${x-r} ${y}a${r} ${r} 0 1 0 ${2*r} 0a${r} ${r} 0 1 0-${2*r} 0`;
       }
@@ -105,17 +114,24 @@ backend:
           },
         ],
         
-        "global-entropy": [
+        "global-2x2": [
           {
-            path:
-              "M-19.2-19.2H19.2V19.2H-19.2Z " +
-              "M0-19.2V19.2 " +
-              "M-19.2 0H19.2"
-          }
-        ],
-        
-        "global-mod-3": [
-          { text: "③", fontSize: 34 },
+            path: rect(-9.6, -9.6, 19.2),
+            fill: "#0044C455",
+          },
+          {
+            path: rect(9.6, -9.6, 19.2),
+            fill: "#CC331155",
+          },
+          {
+            path: rect(-9.6, 9.6, 19.2),
+            fill: "#eeeeee55",
+          },
+          {
+            path: rect(9.6, 9.6, 19.2),
+            fill: "#11773355",
+          },
+          { text: "?", fontSize: 10, dx:0.1, dy:-0.15 },
         ],
 
         "rotational": [
